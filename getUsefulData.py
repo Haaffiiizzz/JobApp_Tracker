@@ -1,15 +1,17 @@
 import json
+import re
 
 with open("message.json", "r") as file:
     messagesList = json.load(file)
     
 newStore = []
-
+pattern = r'[\u200b\u200c\u200d\u200e\u200f\ufeff\u034f]'
 for message in messagesList:
     messageStore = {}
     
     messageStore["id"] = message["id"]
-    messageStore["snippet"] = message.get("snippet", None)
+    messageStore["snippet"] = re.sub(pattern, '', message.get("snippet", None)).strip()
+    
     
     headers = message["payload"]["headers"]
     
@@ -20,7 +22,9 @@ for message in messagesList:
         elif info["name"] == "Subject":
             messageStore["Subject"] = info["value"].strip()
     newStore.append(messageStore)
-    print(messageStore)
     
+
+with open("cleanedMessages.json", "w") as file:
+    json.dump(newStore, file, indent=4) 
 # print(newStore)
     
