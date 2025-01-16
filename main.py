@@ -1,56 +1,94 @@
 import requests
 import json
-import base64
 from bs4 import BeautifulSoup
-with open("apikey.txt", "r") as file:
-    key = file.read()
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.http import BatchHttpRequest
+import os.path
+import urllib.parse
 
-with open("token.json", "r") as file:
-    token = json.loads(file.read())["token"] 
-
-headers = {
-    'Authorization': f'Bearer {token}',
-    'Accept': 'application/json',
-}
-
-profile = requests.get(
-    f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/profile?key={key}',
-    headers=headers,
-)
-
-messages = requests.get(f"https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q=after:2024/06/01 before:2025/01/14&key={key}&maxResults=500",
-                        headers=headers) #get all messages within a time frame. could add sender here to by adding with f string from:({sender_emails}) which is a string of emails with OR separating each.
-print(messages.json())
-# for message in messages.json():
- 
-messageIds = [messageDict["id"] for messageDict in messages.json()["messages"]]
-with open("messageIdList.json", "w") as file:
-    json.dump(messageIds, file, indent=4)
-
-
-
-# for message in messages.json()["messages"][0:20]:
-#     message = requests.get(f"https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages/{message['id']}?format=full&key={key}",
-#                         headers=headers)
-#     # with open(f"{count}.json", "w") as file:
-#     #     json.dump(message.json(), file, indent=10)
-#     # print(message.json()["payload"]["body"]["data"])
+def getMessageId() -> list:
     
-#     encoded_body = message.json().get("payload", {}).get("body", {}).get("data", "")
+    """
+    Here I am making a call to get the a list of dicts containing message ids
+    and thread ids over a time frame having specific keywords. Other filters/ queries can be added including
+    where message is from (f string from:({sender_emails})). A list of the message Ids
+    is returned.
+    """
+    with open("apikey.txt", "r") as file:
+        key = file.read()
 
-#     # Decode the Base64 data
-#     decoded_bytes = base64.urlsafe_b64decode(encoded_body)
-#     decoded_content = decoded_bytes.decode("utf-8")
+    with open("token.json", "r") as file:
+        token = json.loads(file.read())["token"] 
 
-#     # Check if the content is HTML
-#     mime_type = message.json().get("payload", {}).get("mimeType", "")
-#     if mime_type == "text/html":
-#         # Parse the HTML content
-#         soup = BeautifulSoup(decoded_content, "html.parser")
-#         readable_content = soup.get_text()
-#         print("HTML Content (Readable):")
-#         print(readable_content)
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Accept': 'application/json',
+    }
+    query = 'after:2024/06/01 before:2025/01/14 "application OR applying OR applied OR rejection OR rejected"'
+    query = urllib.parse.quote(query)
     
-#     print("\n")
+    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=500'
+
+    messages = requests.get(url, headers=headers)
     
-# https://www.googleapis.com/gmail/v1/users/me/messages?q=in:sent after:2014/01/01 before:2014/02/01
+    messageIds = [messageDict["id"] for messageDict in messages.json()["messages"]]
+    
+    return messageIds
+    
+def getMessageBatch(messageIds: list) -> list:
+    
+    """
+    Given a list of messageIds, this function attempts to get the message infos
+    in batches. Each batch is limited to 100 retrievals. It'd make sense to send
+    a messageIds list with size 100.After authentication, a list of message dicts is returned.
+    """
+    
+    SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+    
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+            "credentials.json", SCOPES)
+                creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+            with open("token.json", "w") as token:
+                token.write(creds.to_json())
+                
+
+    service = build('gmail', 'v1', credentials=creds)
+    messages = []
+    
+    # Callback function to process responses
+    def handleResponse(request_id, response, exception):
+        if exception is not None:
+            print(f"An error occurred for request {request_id}: {exception}")
+        else:
+            messages.append(response)
+
+
+    batch = BatchHttpRequest(callback=handleResponse, batch_uri='https://gmail.googleapis.com/batch')
+
+    for message_id in messageIds:
+        request = service.users().messages().get(userId='me', id=message_id, format='metadata')
+        batch.add(request)
+
+    batch.execute()
+
+    return messages
+
+def main():
+    print("hello")
+
+if __name__ == "__main__":
+    main()
