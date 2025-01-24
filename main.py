@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import BatchHttpRequest
 import os.path
 import urllib.parse
+import time
 
 def getMessageId() -> list:
     
@@ -33,11 +34,10 @@ def getMessageId() -> list:
     query = 'after:2024/06/01 before:2025/01/14 "application OR applying OR applied OR rejection OR rejected"'
     query = urllib.parse.quote(query)
     
-    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=500'
+    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz24%40gmail.com/messages?q={query}&key={key}&maxResults=500'
 
-    messages = requests.get(url, headers=headers)
-    
-    messageIds = [messageDict["id"] for messageDict in messages.json()["messages"]]
+    response = requests.get(url, headers=headers)
+    messageIds = [messageDict["id"] for messageDict in response.json()["messages"]]
     
     return messageIds
     
@@ -88,7 +88,23 @@ def getMessageBatch(messageIds: list) -> list:
     return messages
 
 def main():
-    print("hello")
-
+    messageIds = getMessageId()
+    with open("messageid.json", "w") as file:
+        json.dump(messageIds, file, indent=4)
+        
+    metadataList = []
+    
+    for i in range(0, 500, 50):
+        IdSection = messageIds[i:i+50]
+        sectionMetadata = getMessageBatch(IdSection)
+        metadataList.extend(sectionMetadata)
+        
+        time.sleep(2)
+        
+    with open("messages.json", "w") as file:
+        json.dump(file, metadataList, indent=4)
+    print(metadataList)
+        
+        
 if __name__ == "__main__":
     main()
