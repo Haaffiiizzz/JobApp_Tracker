@@ -81,7 +81,7 @@ def getMessageBatch(messageIds: list) -> list:
     batch = BatchHttpRequest(callback=handleResponse, batch_uri='https://gmail.googleapis.com/batch')
 
     for message_id in messageIds:
-        request = service.users().messages().get(userId='me', id=message_id, format='full')
+        request = service.users().messages().get(userId='me', id=message_id, format='metadata')
         batch.add(request)
 
     batch.execute()
@@ -108,7 +108,7 @@ def main():
         
         time.sleep(1)
         
-    with open("full.json", "w") as file:
+    with open("metadata.json", "w") as file:
         
         json.dump(messageList, file, indent=4)
     # print(metadataList)

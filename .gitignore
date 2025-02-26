@@ -2,3 +2,4 @@ venv
 credentials.json
 token.json
 apikey.txt
+.env
