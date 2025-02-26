@@ -34,9 +34,10 @@ def getMessageId() -> list:
     query = 'after:2024/06/01 before:2025/01/14 "application OR applying OR applied OR rejection OR rejected"'
     query = urllib.parse.quote(query)
     
-    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz24%40gmail.com/messages?q={query}&key={key}&maxResults=500'
+    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=20'
 
     response = requests.get(url, headers=headers)
+    print(response.json())
     messageIds = [messageDict["id"] for messageDict in response.json()["messages"]]
     
     return messageIds
@@ -94,15 +95,20 @@ def main():
         
     metadataList = []
     
-    for i in range(0, 500, 50):
-        IdSection = messageIds[i:i+50]
+    for i in range(0, len(messageIds), 10):
+        IdSection = messageIds[i:i+10]
         sectionMetadata = getMessageBatch(IdSection)
+        
+        for metadata in sectionMetadata:
+            metadataList.append(metadata)
         metadataList.extend(sectionMetadata)
+        print(f"Section {i} done")
         
         time.sleep(2)
         
     with open("messages.json", "w") as file:
-        json.dump(file, metadataList, indent=4)
+        
+        json.dump(metadataList, file, indent=4)
     print(metadataList)
         
         
