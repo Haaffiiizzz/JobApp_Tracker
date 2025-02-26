@@ -31,10 +31,10 @@ def getMessageId() -> list:
         'Authorization': f'Bearer {token}',
         'Accept': 'application/json',
     }
-    query = 'after:2024/06/01 before:2025/01/14 "application OR applying OR applied OR rejection OR rejected"'
+    query = 'after:2024/06/01 before:2025/02/26 "application OR applying OR applied OR rejection OR rejected OR applied OR unfortunately OR regret OR submit OR thank OR you OR considered OR considering"'
     query = urllib.parse.quote(query)
     
-    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=20'
+    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=499'
 
     response = requests.get(url, headers=headers)
     print(response.json())
@@ -46,8 +46,8 @@ def getMessageBatch(messageIds: list) -> list:
     
     """
     Given a list of messageIds, this function attempts to get the message infos
-    in batches. Each batch is limited to 100 retrievals. It'd make sense to send
-    a messageIds list with size 100.After authentication, a list of message dicts is returned.
+    in batches. Theres a limit to the number of requests that can be made at a time
+    so the function is designed to handle this. The messages are returned in a list.
     """
     
     SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -81,7 +81,7 @@ def getMessageBatch(messageIds: list) -> list:
     batch = BatchHttpRequest(callback=handleResponse, batch_uri='https://gmail.googleapis.com/batch')
 
     for message_id in messageIds:
-        request = service.users().messages().get(userId='me', id=message_id, format='metadata')
+        request = service.users().messages().get(userId='me', id=message_id, format='full')
         batch.add(request)
 
     batch.execute()
@@ -89,27 +89,29 @@ def getMessageBatch(messageIds: list) -> list:
     return messages
 
 def main():
+    """Using the message ids, I try to get the messages in batches and store them in a json file.
+    """
     messageIds = getMessageId()
     with open("messageid.json", "w") as file:
         json.dump(messageIds, file, indent=4)
         
-    metadataList = []
+    messageList = []
     
-    for i in range(0, len(messageIds), 10):
-        IdSection = messageIds[i:i+10]
+    for i in range(0, len(messageIds), 30):
+        IdSection = messageIds[i:i+30]
         sectionMetadata = getMessageBatch(IdSection)
         
         for metadata in sectionMetadata:
-            metadataList.append(metadata)
-        metadataList.extend(sectionMetadata)
+            messageList.append(metadata)
+        messageList.extend(sectionMetadata)
         print(f"Section {i} done")
         
-        time.sleep(2)
+        time.sleep(1)
         
-    with open("messages.json", "w") as file:
+    with open("full.json", "w") as file:
         
-        json.dump(metadataList, file, indent=4)
-    print(metadataList)
+        json.dump(messageList, file, indent=4)
+    # print(metadataList)
         
         
 if __name__ == "__main__":
