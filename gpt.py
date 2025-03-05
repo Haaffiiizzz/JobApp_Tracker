@@ -20,15 +20,42 @@ Each email dictionary has the following structure:
   'Subject': 'The subject of the email'
 }}
 
-Your task is to return a JSON list (valid JSON) of email dictionaries in the same format,
-but only include emails that are relevant to job applications. Specifically, include 
-emails that either confirm an application, indicate a rejection, or signal progression in the 
-hiring process. Determine relevance solely by analyzing the snippet, sender, and subject
-using your natural language understanding of job application communications. If no emails match these 
-criteria, return an empty list.
+Your task is to filter emails that are relevant to job applications. Specifically, include 
+emails that either:
+- Confirm an application submission
+- Indicate a rejection
+- Signal progression in the hiring process
 
-This is your input: {messages}
-"""
+Determine relevance **solely** by analyzing the snippet, sender, and subject using your natural 
+language understanding of job application communications.
+
+### **Expected JSON Output Format:**  
+Return a **valid JSON list** of dictionaries. Each dictionary should have:  
+- A key named `'sender'` containing the sender's email address  
+- A key named `'emails'` containing a **list** of relevant emails from that sender  
+
+For example:
+```json
+[
+  {{
+    "sender": "jobs@example.com",
+    "emails": [
+      {{
+        "id": "123abc",
+        "snippet": "Thank you for applying...",
+        "subject": "Application Received"
+      }},
+      {{
+        "id": "456def",
+        "snippet": "Unfortunately, we regret...",
+        "subject": "Application Status Update"
+      }}
+    ]
+  }}
+]
+Ensure that the output is a valid JSON structure.
+
+Here is your input: {messages} """
 
 
         
@@ -38,18 +65,43 @@ completion = client.chat.completions.create(
     {"role": "user", "content": prompt}
     ]
 )
-result = completion.choices[0].message.content.strip()
-
-
-if result.startswith("```"):
-    result = result.split("```")[1].strip()
-    index = result.find("[")
-    result = result[index:]
-if result.endswith("```"):
-    result = result.split("```")[0].strip()
-    
-result = json.loads(result)
-
-with open("relevantMessages.json", "w") as file:
+result = completion
+#completion.choices[0].message.content.strip()
+with open("completions.json", "w") as file:
     json.dump(result, file, indent=4)
-print(result)
+# with open("rawgpt.txt", "w") as file:
+#     file.write(result)
+    
+# print("raw from gpt", result)
+# if result.startswith("```"):
+#     parts = result.split("```")
+#     result = parts[1] if len(parts) > 1 else result
+#     result = result.replace("json", "", 1).strip()  # Remove 'json' if present
+
+# # Find the first valid JSON structure
+# index = result.find("[")
+# if index != -1:
+#     result = result[index:]
+
+# # Ensure trailing code block markers are removed
+# if result.endswith("```"):
+#     result = result.rsplit("```", 1)[0].strip()
+
+# # Convert to JSON
+# try:
+#     data = json.loads(result)
+#     print("Valid JSON:", data)
+# except json.JSONDecodeError:
+#     print("Invalid JSON:", result)
+
+# with open("cleanres.txt", "w") as file:
+#     file.write(result)
+# print("cleaned res", result)
+
+# result = json.loads(result)
+
+# with open("relevantMessages.json", "w") as file:
+#     json.dump(result, file, indent=4)
+# print(result)
+# print()
+# print(len(result))
