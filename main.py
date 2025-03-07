@@ -38,13 +38,12 @@ def getMessageId() -> list:
             "OR follow-up OR response OR update OR hiring OR offer OR accepted OR hired OR appreciate OR grateful OR regards OR "
             "sincerely OR competitive")
 
-    query = f'after:2024/06/01 before:2025/03/03 {keywords}'
+    query = f'after:2024/06/01 before:2025/03/07 {keywords}'
     query = urllib.parse.quote(query)
     
     url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=10000'
 
     response = requests.get(url, headers=headers)
-    print(response.json())
     messageIds = [messageDict["id"] for messageDict in response.json()["messages"]]
     
     return messageIds
@@ -99,27 +98,27 @@ def main():
     """Using the message ids, I try to get the messages in batches and store them in a json file.
     """
     messageIds = getMessageId()
-    # print(messageIds)
+    
     with open("messageid.json", "w") as file:
         json.dump(messageIds, file, indent=4)
         
     messageList = []
     
-    # for i in range(0, len(messageIds), 20):
-    #     IdSection = messageIds[i:i+20]
-    #     sectionMetadata = getMessageBatch(IdSection)
+    for i in range(len(messageIds), 5):
+        IdSection = messageIds[i: i+5]
+        sectionMetadata = getMessageBatch(IdSection)
         
-    #     for metadata in sectionMetadata:
-    #         messageList.append(metadata)
-    #     messageList.extend(sectionMetadata)
-    #     print(f"Section {i} done")
+        for metadata in sectionMetadata:
+            messageList.append(metadata)
+        messageList.extend(sectionMetadata)
+        print(f"Section {i} done")
         
-    #     time.sleep(1)
+        # time.sleep(1)
         
-    # with open("metadata.json", "w") as file:
+    with open("metadata.json", "w") as file:
         
-    #     json.dump(messageList, file, indent=4)
-    # # print(metadataList)
+        json.dump(messageList, file, indent=4)
+    # print(metadataList)
         
         
 if __name__ == "__main__":
