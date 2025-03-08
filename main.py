@@ -113,12 +113,11 @@ def main():
         messageList.extend(sectionMetadata)
         print(f"Section {i} done")
         
-        # time.sleep(1)
         
     with open("metadata.json", "w") as file:
         
         json.dump(messageList, file, indent=4)
-    # print(metadataList)
+    print(metadataList)
         
         
 if __name__ == "__main__":
