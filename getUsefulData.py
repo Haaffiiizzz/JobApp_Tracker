@@ -1,7 +1,7 @@
 import json
 import re
 
-with open("metadata.json", "r") as file:
+with open("messages.json", "r") as file:
     messagesList = json.load(file)
     
 newStore = []

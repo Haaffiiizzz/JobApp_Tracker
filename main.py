@@ -38,7 +38,7 @@ def getMessageId() -> list:
             "OR follow-up OR response OR update OR hiring OR offer OR accepted OR hired OR appreciate OR grateful OR regards OR "
             "sincerely OR competitive")
 
-    query = f'after:2024/06/01 before:2025/03/07 {keywords}'
+    query = f'after:2024/06/01 before:2025/03/10 {keywords}'
     query = urllib.parse.quote(query)
     
     url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=10000'
@@ -104,7 +104,7 @@ def main():
         
     messageList = []
     
-    for i in range(len(messageIds), 5):
+    for i in range(0, len(messageIds), 5):
         IdSection = messageIds[i: i+5]
         sectionMetadata = getMessageBatch(IdSection)
         
@@ -114,10 +114,10 @@ def main():
         print(f"Section {i} done")
         
         
-    with open("metadata.json", "w") as file:
+    with open("messages.json", "w") as file:
         
         json.dump(messageList, file, indent=4)
-    print(metadataList)
+    # print(messageList)
         
         
 if __name__ == "__main__":

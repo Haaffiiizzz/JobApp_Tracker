@@ -65,10 +65,19 @@ completion = client.chat.completions.create(
     {"role": "user", "content": prompt}
     ]
 )
-result = completion
+result = completion.choices[0]
 #completion.choices[0].message.content.strip()
-with open("completions.json", "w") as file:
-    json.dump(result, file, indent=4)
+with open("completions.txt", "w") as file:
+  try:
+    file.write(result)
+  except Exception as e:
+    print(e)
+    try:
+      file.write(str(result))
+    except Exception as e:
+      print(e)
+  finally:
+    print(result)
 # with open("rawgpt.txt", "w") as file:
 #     file.write(result)
     
