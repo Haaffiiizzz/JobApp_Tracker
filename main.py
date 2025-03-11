@@ -38,13 +38,26 @@ def getMessageId() -> list:
             "OR follow-up OR response OR update OR hiring OR offer OR accepted OR hired OR appreciate OR grateful OR regards OR "
             "sincerely OR competitive")
 
-    query = f'after:2024/06/01 before:2025/03/10 {keywords}'
+    query = f'after:2024/06/01 before:2025/03/11 {keywords}'
     query = urllib.parse.quote(query)
+    messageIds = []
     
-    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=10000'
+    url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=500'
 
     response = requests.get(url, headers=headers)
     messageIds = [messageDict["id"] for messageDict in response.json()["messages"]]
+    nextPageToken = response.json().get("nextPageToken", None)
+    i = 1
+    while nextPageToken:
+        print("entered next page", i)
+        time.sleep(1)
+        url = f'https://gmail.googleapis.com/gmail/v1/users/dadaabdulhafiz0306%40gmail.com/messages?q={query}&key={key}&maxResults=500&pageToken={nextPageToken}'
+        response = requests.get(url, headers=headers)
+        nextPageToken = response.json().get("nextPageToken", None)
+        
+        messageIds.extend([messageDict["id"] for messageDict in response.json()["messages"]])
+        i += 1
+    
     
     return messageIds
     
@@ -94,14 +107,9 @@ def getMessageBatch(messageIds: list) -> list:
 
     return messages
 
-def main():
+def runBatches(messageIds: list):
     """Using the message ids, I try to get the messages in batches and store them in a json file.
     """
-    messageIds = getMessageId()
-    
-    with open("messageid.json", "w") as file:
-        json.dump(messageIds, file, indent=4)
-        
     messageList = []
     
     for i in range(0, len(messageIds), 5):
@@ -115,9 +123,17 @@ def main():
         
         
     with open("messages.json", "w") as file:
-        
         json.dump(messageList, file, indent=4)
+        
+    return messageList
     # print(messageList)
+
+def main():
+    messageIds = getMessageId()
+    
+    # messages = runBatches(messageIds)
+    
+    print(messageIds, len(messageIds))
         
         
 if __name__ == "__main__":

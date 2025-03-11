@@ -2,6 +2,13 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 import json
+from pydantic import Json, BaseModel, Field
+
+
+class Response(BaseModel):
+  sender: str = Field(..., description="Sender email address")
+  emails: list[dict] = Field(..., description="List of emails")
+# response_format={"type": "json_object"}
 
 load_dotenv()
 with open("cleanedMessages.json", "r") as file:
@@ -59,23 +66,20 @@ Here is your input: {messages} """
 
 
         
-completion = client.chat.completions.create(
+completion = client.beta.chat.completions.parse(
     model="gpt-4o-mini",
     messages=[ 
     {"role": "user", "content": prompt}
-    ]
+    ],
+    response_format={"type": "json_object"}
 )
-result = completion.choices[0]
+result = completion.choices[0].message.content
 #completion.choices[0].message.content.strip()
-with open("completions.txt", "w") as file:
+with open("completions.json", "w") as file:
   try:
-    file.write(result)
+    json.dump(result, file, indent=4)
   except Exception as e:
     print(e)
-    try:
-      file.write(str(result))
-    except Exception as e:
-      print(e)
   finally:
     print(result)
 # with open("rawgpt.txt", "w") as file:
