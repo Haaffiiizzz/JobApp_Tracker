@@ -1,0 +1,99 @@
+{
+  "result": [
+    {
+      "sender": "no-reply@hire.lever.co",
+      "emails": [
+        {
+          "id": "194a1ae81520d851",
+          "snippet": "Hi Abdulhafiz, Thanks for expressing your interest in working with our team. We know that searching for a new job is time consuming (and stressful), so we want to fill you in on what to expect with our",
+          "subject": "Safe Software - We've received your application!"
+        },
+        {
+          "id": "194a1d5dcc8ea2ae",
+          "snippet": "Hi Abdulhafiz, Thank you for applying to the Software Development in Test Intern position at Trojan. We appreciate your interest. We will follow up if your background and professional achievements are",
+          "subject": "Application Received"
+        },
+        {
+          "id": "194a1a1373f627ca",
+          "snippet": "Hi Abdulhafiz, Thank you for your interest in the Software Developer Co-op (Summer 2025) opportunity! We wanted to let you know we received your application. Our Talent Acquisition team will review",
+          "subject": "Thank you for your application to Magnet Forensics"
+        },
+        {
+          "id": "194a1b365bb13986",
+          "snippet": "Amazon.jobs Hi Abdulhafiz, Thank you for your interest in Software Development Engineer Intern - Computer Science (ID: 2880902). If you have completed the application: Great! You can now check the",
+          "subject": "Keep track of your application"
+        }
+      ]
+    },
+    {
+      "sender": "workday@myworkday.com",
+      "emails": [
+        {
+          "id": "1943ad16f2fc2ce9",
+          "snippet": "Hello Abdulhafiz, Thank you for taking the first step towards a career at the Bank of Canada by applying to the Student, Web Development position. We truly appreciate your interest and the time you",
+          "subject": "Bank of Canada - 10564, Student, Web Development"
+        },
+        {
+          "id": "1943ad2de64cfe2a",
+          "snippet": "Dear Abdulhafiz We have received your application for the position of Software Automation Test Engineer (Co-op/Intern) and are currently reviewing your experience and qualifications. If your profile",
+          "subject": "Thank You for Applying"
+        }
+      ]
+    },
+    {
+      "sender": "no-reply@us.greenhouse-mail.io",
+      "emails": [
+        {
+          "id": "194a2d5d6736409b",
+          "snippet": "Hi Abdulhafiz, Thank you for your recent application to 2025 Summer Intern, Software Engineer (MPS) role. We appreciate your interest in Samsung Research America and we are excited to review your",
+          "subject": "Thank you for applying to Samsung Research America Internship"
+        },
+        {
+          "id": "1942e0bccdc23e08",
+          "snippet": "Hi Abdulhafiz, Thank you for your interest in Saronic! We wanted to let you know we received your application for Software Engineer Intern, and we are delighted that you would consider joining our team",
+          "subject": "Thank you for your application to Saronic"
+        }
+      ]
+    },
+    {
+      "sender": "Uber @ icims",
+      "emails": [
+        {
+          "id": "19470ff4a7941eb8",
+          "snippet": "Dear Abdulhafiz, Thank you very much for your recent application to the 2025 Software Engineer Internship, Waterloo position at Uber. Your submission will be reviewed by our recruiting staff, and we",
+          "subject": "Thank You for Applying"
+        }
+      ]
+    },
+    {
+      "sender": "lumentum@myworkday.com",
+      "emails": [
+        {
+          "id": "1943ab5c77bee2b7",
+          "snippet": "Hello Abdulhafiz, Thank you for expressing your interest in BMO. We’re dedicated to defining great customer experiences – and we’re always looking for bright and passionate people who can do the same. We",
+          "subject": "We’ve Received Your Application for Junior Software Developer, Summer 2025 (Co-op/Internship) - 4 Months - R250000127"
+        }
+      ]
+    },
+    {
+      "sender": "workday-support@salesforce.com",
+      "emails": [
+        {
+          "id": "1949f5f4f73956f3",
+          "snippet": "Hi Abdulhafiz, Thank you for your interest in a career at Salesforce. We have reviewed your qualifications for the Summer 2025 Intern - Software Engineer position. At this time, we have decided to move forward.",
+          "subject": "Update on your application"
+        }
+      ]
+    },
+    {
+      "sender": "no-reply@mongodb.com",
+      "emails": [
+        {
+          "id": "1947b81ecd890d70",
+          "snippet": "Hi Abdulhafiz, Thank you for your interest in MongoDB. We have received your application and are excited that you found your way to us! A member of our Talent Team will review your application.",
+          "subject": "Thank you for applying to MongoDB!"
+        }
+      ]
+    }
+  ]
+}
