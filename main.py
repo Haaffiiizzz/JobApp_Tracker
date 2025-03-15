@@ -12,7 +12,7 @@ from googleapiclient.http import BatchHttpRequest
 import os.path
 import urllib.parse
 import time
-
+import re
 def getMessageId() -> list:
     
     """
@@ -31,14 +31,12 @@ def getMessageId() -> list:
         'Authorization': f'Bearer {token}',
         'Accept': 'application/json',
     }
-    keywords = ("application OR applying OR applied OR rejection OR rejected OR unfortunately OR regret OR submit OR "
-            "submitted OR thank OR thank you OR considered OR considering OR experience OR qualifications OR skills OR "
-            "background OR eligibility OR criteria OR requirements OR consideration OR reviewed OR screening OR interview OR "
-            "shortlist OR selection OR candidate OR position OR role OR opportunity OR unsuccessful OR declined OR assessment "
-            "OR follow-up OR response OR update OR hiring OR offer OR accepted OR hired OR appreciate OR grateful OR regards OR "
-            "sincerely OR competitive")
+    keywords = "{application applying applied rejection rejected unfortunately regret submit submitted thank thank you considered " \
+               "considering experience qualifications skills background eligibility criteria requirements consideration reviewed screening interview " \
+               "shortlist selection candidate position role opportunity unsuccessful declined assessment follow-up response update hiring offer accepted " \
+               "hired appreciate grateful regards sincerely competitive}"
 
-    query = f'after:2024/06/01 before:2025/03/11 {keywords}'
+    query = f'after:2024/06/01 before:2025/03/15 {keywords}'
     query = urllib.parse.quote(query)
     messageIds = []
     
@@ -66,7 +64,7 @@ def getMessageBatch(messageIds: list) -> list:
     """
     Given a list of messageIds, this function attempts to get the message infos
     in batches. Theres a limit to the number of requests that can be made at a time
-    so the function is designed to handle this. The messages are returned in a list.
+    so the function that calls it (runBatches) is designed to handle this. The messages are returned in a list.
     """
     
     SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -128,12 +126,42 @@ def runBatches(messageIds: list):
     return messageList
     # print(messageList)
 
+def cleanMessage(messagesList: list):
+    """
+    This function will clean the original messages list straight from gmail api, 
+    and return only the needed parts
+    """
+        
+    newStore = []
+    pattern = r'[\u200b\u200c\u200d\u200e\u200f\ufeff\u034f]'
+    for message in messagesList:
+        messageStore = {}
+        
+        messageStore["id"] = message["id"]
+        messageStore["snippet"] = re.sub(pattern, '', message.get("snippet", None)).strip()
+        
+        headers = message["payload"]["headers"]
+        
+        for info in headers:
+            if info["name"] == "From":
+                messageStore["Sender"] = info["value"].strip()
+            
+            elif info["name"] == "Subject":
+                messageStore["Subject"] = info["value"].strip()
+        newStore.append(messageStore)
+        
+    return newStore
+
 def main():
     messageIds = getMessageId()
+    messages = runBatches(messageIds)
     
-    # messages = runBatches(messageIds)
+    cleanedMessages = cleanMessage(messages)
     
-    print(messageIds, len(messageIds))
+    with open("cleanedMessages.json", "w") as file:
+        json.dump(cleanedMessages, file, indent=4)
+    print(cleanedMessages)
+
         
         
 if __name__ == "__main__":
